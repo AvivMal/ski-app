@@ -1,10 +1,10 @@
-  import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Plane, Hotel, Snowflake, DollarSign, ShoppingBag, Sun, Moon, MapPin, CalendarDays, Clock, Building, Star, Info, Users, Utensils, Zap, Bus } from 'lucide-react';
 
 // Define exchange rates
-const USD_TO_ILS = 3.7;
-const EUR_TO_USD = 1.08;
-const EUR_TO_ILS = 4.0; // Simplified direct conversion for display
+const USD_TO_ILS = 3.3; // Updated
+const EUR_TO_USD = 1.15; // Updated (3.8 / 3.3 = ~1.15)
+const EUR_TO_ILS = 3.8; // Updated
 
 // Data for Mayrhofen, Austria
 const mayrhofenData = {
@@ -16,8 +16,8 @@ const mayrhofenData = {
             destination: 'מינכן (MUC)',
             destinationEn: 'Munich (MUC)',
             arrivalTime: '09:00',
-            notes: 'קיימת גם אופציה עם אל-על + ישראייר',
-            notesEn: 'Also available with El Al + Israir',
+            notes: 'קיימת גם אופציה עם אל-על + ישראייר (343$)', // Updated
+            notesEn: 'Also available with El Al + Israir ($343)', // Updated
         },
         return: {
             date: '2026-01-19',
@@ -27,7 +27,7 @@ const mayrhofenData = {
             destinationEn: 'Tel Aviv (TLV)',
             arrivalTime: '15:00',
         },
-        costUSD: 450, // Lufthansa option cost
+        costUSD: 359, // Updated
     },
     transfers: {
         costEUR: 80, // Estimated shuttle from Munich
@@ -58,28 +58,28 @@ const mayrhofenData = {
             name: 'Sport & Spa Hotel Strass',
             rating: '4-star',
             dates: '2026-01-12 - 2026-01-19',
-            costEUR: 800, // Cost per person for 7 nights
-            notes: 'כולל חצי פנסיון, ספא מעולה ובריכה מחוממת, חיי לילה תוססים, מיקום מעולה ליד רכבל Penkenbahn.',
-            notesEn: 'Includes Half Board, excellent spa & heated pool, lively nightlife, prime location next to Penkenbahn gondola.',
+            costEUR: Math.round(4965 / EUR_TO_ILS), // Updated from ILS to EUR
+            notes: 'על בסיס ארוחת בוקר. שדרוג לחצי פנסיון בתוספת של ₪752 לאדם.', // Updated
+            notesEn: 'Based on breakfast. Upgrade to half board for an additional ₪752 per person.', // Updated
             link: 'https://www.booking.com/hotel/at/fun.html'
         },
         {
             name: 'Hotel St. Georg',
             rating: '4-star',
             dates: '2026-01-12 - 2026-01-19',
-            costEUR: 700,
+            costEUR: Math.round(3909 / EUR_TO_ILS), // Updated from ILS to EUR
             notes: 'כולל חצי פנסיון, ספא טוב ובריכה מקורה, מיקום שקט יותר אך הליכה קצרה למעליות ולמרכז.',
             notesEn: 'Includes Half Board, good spa & indoor pool, quieter location but walkable to lifts/center.',
             link: 'https://www.booking.com/hotel/at/st-georg-mayrhofen.html'
         },
         {
-            name: 'Hotel Neue Post',
-            rating: '4-star',
+            name: 'Apart Mountain Lodge Mayrhofen', // New hotel
+            rating: '4-star apartment', // Updated rating
             dates: '2026-01-12 - 2026-01-19',
-            costEUR: 750,
-            notes: 'כולל חצי פנסיון, בריכה מקורה נחמדה וספא, מיקום מרכזי.',
-            notesEn: 'Includes Half Board, nice indoor pool & spa, central location.',
-            link: 'https://www.booking.com/hotel/at/neue-post.html'
+            costEUR: Math.round(2801 / EUR_TO_ILS), // Updated from ILS to EUR
+            notes: 'דירה הכוללת מטבח וכלי בישול, ביקורות איכותיות, מארחים טובים, קרובה למעליות (Ahornbahn/Penkenbahn).', // New notes
+            notesEn: 'Apartment with kitchen and cooking utensils, high-quality reviews, good hosts, close to lifts (Ahornbahn/Penkenbahn).', // New notes
+            link: 'https://www.booking.com/hotel/at/apart-mountainlodge-mayrhofen.html' // Confirmed link
         },
     ],
     dailyExpenses: {
@@ -111,10 +111,10 @@ const andorraData = {
             destinationEn: 'Tel Aviv (TLV)',
             arrivalTime: '16:00',
         },
-        costUSD: 350,
+        costUSD: 343, // Updated
     },
     transfers: {
-        costEUR: 102, // 110 USD / 1.08 EUR/USD = ~101.85 EUR
+        costEUR: 102, // 110 USD / EUR_TO_USD = ~101.85 EUR
         provider: 'Andbus',
         providerEn: 'Andbus',
         notes: 'שאטל מברצלונה לפס דה לה קאסה',
@@ -188,7 +188,7 @@ const andorraData = {
 };
 
 const App = () => {
-    const [selectedDestination, setSelectedDestination] = useState(null); // 'andorra' or 'austria'
+    const [selectedDestination, setSelectedDestination] = useState(null); // 'andorra', 'austria', or 'bansko'
     const [language, setLanguage] = useState('he'); // 'he' for Hebrew, 'en' for English
 
     const toggleLanguage = () => {
@@ -200,36 +200,36 @@ const App = () => {
 
     const renderText = (heText, enText) => (isHebrew ? heText : enText);
 
-const calculateTotalCost = (data, selectedAccommodationCostEUR) => {
-    const flightsCostUSD = data.flights.costUSD;
-    const transfersCostUSD = data.transfers.costEUR * EUR_TO_USD;
-    const skiPassCostUSD = data.skiPass.totalCostEUR * EUR_TO_USD;
-    const equipmentCostUSD = data.equipment.costEUR * EUR_TO_USD;
-    const dailyExpensesCostUSD = data.dailyExpenses.totalCostEUR * EUR_TO_USD;
-    const accommodationCostUSD = selectedAccommodationCostEUR * EUR_TO_USD;
+    const calculateTotalCost = (data, selectedAccommodationCostEUR) => {
+        const flightsCostUSD = data.flights.costUSD;
+        const transfersCostUSD = data.transfers.costEUR * EUR_TO_USD;
+        const skiPassCostUSD = data.skiPass.totalCostEUR * EUR_TO_USD;
+        const equipmentCostUSD = data.equipment.costEUR * EUR_TO_USD;
+        const dailyExpensesCostUSD = data.dailyExpenses.totalCostEUR * EUR_TO_USD;
+        const accommodationCostUSD = selectedAccommodationCostEUR * EUR_TO_USD;
 
-    const totalUSD = flightsCostUSD + transfersCostUSD + skiPassCostUSD + equipmentCostUSD + dailyExpensesCostUSD + accommodationCostUSD;
-    const totalILS = totalUSD * USD_TO_ILS;
+        const totalUSD = flightsCostUSD + transfersCostUSD + skiPassCostUSD + equipmentCostUSD + dailyExpensesCostUSD + accommodationCostUSD;
+        const totalILS = totalUSD * USD_TO_ILS;
 
-    return {
-        totalUSD: Math.round(totalUSD), // עיגול הסכום הכולל בדולרים
-        totalILS: Math.round(totalILS), // עיגול הסכום הכולל בשקלים
-        flightsCostUSD: Math.round(flightsCostUSD), // עיגול עלות הטיסות
-        transfersCostUSD: Math.round(transfersCostUSD), // עיגול עלות ההעברות
-        skiPassCostUSD: Math.round(skiPassCostUSD), // עיגול עלות הסקי פס
-        equipmentCostUSD: Math.round(equipmentCostUSD), // עיגול עלות ציוד הסקי
-        dailyExpensesCostUSD: Math.round(dailyExpensesCostUSD), // עיגול עלות ההוצאות היומיות
-        accommodationCostUSD: Math.round(accommodationCostUSD), // עיגול עלות הלינה
+        return {
+            totalUSD: Math.round(totalUSD),
+            totalILS: Math.round(totalILS),
+            flightsCostUSD: Math.round(flightsCostUSD),
+            transfersCostUSD: Math.round(transfersCostUSD),
+            skiPassCostUSD: Math.round(skiPassCostUSD),
+            equipmentCostUSD: Math.round(equipmentCostUSD),
+            dailyExpensesCostUSD: Math.round(dailyExpensesCostUSD),
+            accommodationCostUSD: Math.round(accommodationCostUSD),
+        };
     };
-};
 
-const getAccommodationCosts = (accommodationList) => {
-    return accommodationList.map(acc => {
-        const costUSD = acc.costEUR * EUR_TO_USD;
-        const costILS = acc.costEUR * EUR_TO_ILS;
-        return { ...acc, costUSD: Math.round(costUSD), costILS: Math.round(costILS) }; // עיגול עלויות הלינה בדולרים ובשקלים
-    });
-};
+    const getAccommodationCosts = (accommodationList) => {
+        return accommodationList.map(acc => {
+            const costUSD = acc.costEUR * EUR_TO_USD;
+            const costILS = acc.costEUR * EUR_TO_ILS;
+            return { ...acc, costUSD: Math.round(costUSD), costILS: Math.round(costILS) };
+        });
+    };
 
     const currentData = selectedDestination === 'austria' ? mayrhofenData : andorraData;
     const accommodationOptions = currentData ? getAccommodationCosts(currentData.accommodation) : [];
@@ -264,7 +264,7 @@ const getAccommodationCosts = (accommodationList) => {
             {/* Header */}
             <header className="flex justify-between items-center mb-8 pb-4 border-b border-green-700">
                 <h1 className="text-3xl md:text-4xl font-bold text-green-400">
-                    {renderText("הבריחה שלנו מפרס", "yalla lets ski away from Peres")}
+                    {renderText("טיולי הסקי המומלצים שלנו", "Our Recommended Ski Trips")}
                 </h1>
                 <button
                     onClick={toggleLanguage}
@@ -296,11 +296,20 @@ const getAccommodationCosts = (accommodationList) => {
                     >
                         {renderText("אוסטריה", "Austria")}
                     </button>
+                    <button
+                        onClick={() => setSelectedDestination('bansko')} // This will set the state, but no data will be displayed yet
+                        className={`flex-1 px-6 py-4 rounded-xl shadow-lg transition duration-300 ease-in-out
+                            ${selectedDestination === 'bansko' ? 'bg-green-600 text-white' : 'bg-gray-800 text-gray-500 cursor-not-allowed'}
+                            font-bold text-xl`}
+                        disabled // Disable the button for now
+                    >
+                        {renderText("בנסקו (בקרוב...)", "Bansko (Coming Soon...)")}
+                    </button>
                 </div>
             </section>
 
             {/* Trip Details */}
-            {selectedDestination && (
+            {selectedDestination && selectedDestination !== 'bansko' && ( // Only show details if a valid destination is selected and not Bansko
                 <section className="bg-gray-800 p-6 md:p-10 rounded-xl shadow-2xl">
                     <h2 className="text-2xl md:text-3xl font-semibold mb-8 text-green-300">
                         {renderText(
@@ -464,12 +473,12 @@ const getAccommodationCosts = (accommodationList) => {
                             <DollarSign className="text-white" size={24} /> {renderText("סיכום הוצאות מפורט (לאדם)", "Detailed Estimated Expenses (per person)")}
                         </h3>
                         <div className="text-lg mb-4">
-                            <p className="mb-1">{renderText("טיסות:", "Flights:")} ${finalTotalCosts.flightsCostUSD} / {renderText("₪", "₪")}{finalTotalCosts.flightsCostUSD * USD_TO_ILS}</p>
-                            <p className="mb-1">{renderText("העברות:", "Transfers:")} ${finalTotalCosts.transfersCostUSD} / {renderText("₪", "₪")}{finalTotalCosts.transfersCostUSD * USD_TO_ILS}</p>
-                            <p className="mb-1">{renderText("סקי פס:", "Ski Pass:")} ${finalTotalCosts.skiPassCostUSD} / {renderText("₪", "₪")}{finalTotalCosts.skiPassCostUSD * USD_TO_ILS}</p>
-                            <p className="mb-1">{renderText("השכרת ציוד סקי:", "Ski Equipment Rental:")} ${finalTotalCosts.equipmentCostUSD} / {renderText("₪", "₪")}{finalTotalCosts.equipmentCostUSD * USD_TO_ILS}</p>
-                            <p className="mb-1">{renderText("לינה (מלון נבחר):", "Accommodation (Selected Hotel):")} ${finalTotalCosts.accommodationCostUSD} / {renderText("₪", "₪")}{finalTotalCosts.accommodationCostUSD * USD_TO_ILS}</p>
-                            <p className="mb-1">{renderText("הוצאות יומיות (מזון, שתיה, אישיות):", "Daily Expenses (Food, Drinks, Personal):")} ${finalTotalCosts.dailyExpensesCostUSD} / {renderText("₪", "₪")}{finalTotalCosts.dailyExpensesCostUSD * USD_TO_ILS}</p>
+                            <p className="mb-1">{renderText("טיסות:", "Flights:")} ${finalTotalCosts.flightsCostUSD} / {renderText("₪", "₪")}{Math.round(finalTotalCosts.flightsCostUSD * USD_TO_ILS)}</p>
+                            <p className="mb-1">{renderText("העברות:", "Transfers:")} ${finalTotalCosts.transfersCostUSD} / {renderText("₪", "₪")}{Math.round(finalTotalCosts.transfersCostUSD * USD_TO_ILS)}</p>
+                            <p className="mb-1">{renderText("סקי פס:", "Ski Pass:")} ${finalTotalCosts.skiPassCostUSD} / {renderText("₪", "₪")}{Math.round(finalTotalCosts.skiPassCostUSD * USD_TO_ILS)}</p>
+                            <p className="mb-1">{renderText("השכרת ציוד סקי:", "Ski Equipment Rental:")} ${finalTotalCosts.equipmentCostUSD} / {renderText("₪", "₪")}{Math.round(finalTotalCosts.equipmentCostUSD * USD_TO_ILS)}</p>
+                            <p className="mb-1">{renderText("לינה (מלון נבחר):", "Accommodation (Selected Hotel):")} ${finalTotalCosts.accommodationCostUSD} / {renderText("₪", "₪")}{Math.round(finalTotalCosts.accommodationCostUSD * USD_TO_ILS)}</p>
+                            <p className="mb-1">{renderText("הוצאות יומיות (מזון, שתיה, אישיות):", "Daily Expenses (Food, Drinks, Personal):")} ${finalTotalCosts.dailyExpensesCostUSD} / {renderText("₪", "₪")}{Math.round(finalTotalCosts.dailyExpensesCostUSD * USD_TO_ILS)}</p>
                         </div>
                         <p className="text-2xl font-extrabold text-white mt-4">
                             {renderText("סה\"כ כולל לאדם:", "Grand Total per Person:")} ${finalTotalCosts.totalUSD} / {renderText("₪", "₪")}{finalTotalCosts.totalILS}
@@ -478,6 +487,16 @@ const getAccommodationCosts = (accommodationList) => {
                             {renderText("*הערכה בלבד, המחירים עשויים להשתנות. מבוסס על מלון נבחר.", "*Estimate only, prices may vary. Based on selected hotel.")}
                         </p>
                     </div>
+                </section>
+            )}
+            {selectedDestination === 'bansko' && (
+                <section className="bg-gray-800 p-6 md:p-10 rounded-xl shadow-2xl text-center">
+                    <h2 className="text-2xl md:text-3xl font-semibold mb-4 text-green-300">
+                        {renderText("בנסקו", "Bansko")}
+                    </h2>
+                    <p className="text-xl text-gray-400">
+                        {renderText("פרטי טיול לבנסקו יתווספו בקרוב...", "Trip details for Bansko will be added soon...")}
+                    </p>
                 </section>
             )}
         </div>
