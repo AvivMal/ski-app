@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/ski-app/static/css/main.e6c13ad2.css",
+    "main.js": "/ski-app/static/js/main.b6c5cd39.js",
+    "static/js/453.c72c6510.chunk.js": "/ski-app/static/js/453.c72c6510.chunk.js",
+    "index.html": "/ski-app/index.html",
+    "main.e6c13ad2.css.map": "/ski-app/static/css/main.e6c13ad2.css.map",
+    "main.b6c5cd39.js.map": "/ski-app/static/js/main.b6c5cd39.js.map",
+    "453.c72c6510.chunk.js.map": "/ski-app/static/js/453.c72c6510.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.e6c13ad2.css",
+    "static/js/main.b6c5cd39.js"
+  ]
+}
