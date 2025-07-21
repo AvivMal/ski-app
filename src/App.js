@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+  import React, { useState, useEffect } from 'react';
 import { Plane, Hotel, Snowflake, DollarSign, ShoppingBag, Sun, Moon, MapPin, CalendarDays, Clock, Building, Star, Info, Users, Utensils, Zap, Bus } from 'lucide-react';
 
 // Define exchange rates
@@ -200,36 +200,36 @@ const App = () => {
 
     const renderText = (heText, enText) => (isHebrew ? heText : enText);
 
-    const calculateTotalCost = (data, selectedAccommodationCostEUR) => {
-        const flightsCostUSD = data.flights.costUSD;
-        const transfersCostUSD = data.transfers.costEUR * EUR_TO_USD;
-        const skiPassCostUSD = data.skiPass.totalCostEUR * EUR_TO_USD;
-        const equipmentCostUSD = data.equipment.costEUR * EUR_TO_USD;
-        const dailyExpensesCostUSD = data.dailyExpenses.totalCostEUR * EUR_TO_USD;
-        const accommodationCostUSD = selectedAccommodationCostEUR * EUR_TO_USD;
+const calculateTotalCost = (data, selectedAccommodationCostEUR) => {
+    const flightsCostUSD = data.flights.costUSD;
+    const transfersCostUSD = data.transfers.costEUR * EUR_TO_USD;
+    const skiPassCostUSD = data.skiPass.totalCostEUR * EUR_TO_USD;
+    const equipmentCostUSD = data.equipment.costEUR * EUR_TO_USD;
+    const dailyExpensesCostUSD = data.dailyExpenses.totalCostEUR * EUR_TO_USD;
+    const accommodationCostUSD = selectedAccommodationCostEUR * EUR_TO_USD;
 
-        const totalUSD = flightsCostUSD + transfersCostUSD + skiPassCostUSD + equipmentCostUSD + dailyExpensesCostUSD + accommodationCostUSD;
-        const totalILS = totalUSD * USD_TO_ILS;
+    const totalUSD = flightsCostUSD + transfersCostUSD + skiPassCostUSD + equipmentCostUSD + dailyExpensesCostUSD + accommodationCostUSD;
+    const totalILS = totalUSD * USD_TO_ILS;
 
-        return {
-            totalUSD: Math.round(totalUSD),
-            totalILS: Math.round(totalILS),
-            flightsCostUSD: Math.round(flightsCostUSD),
-            transfersCostUSD: Math.round(transfersCostUSD),
-            skiPassCostUSD: Math.round(skiPassCostUSD),
-            equipmentCostUSD: Math.round(equipmentCostUSD),
-            dailyExpensesCostUSD: Math.round(dailyExpensesCostUSD),
-            accommodationCostUSD: Math.round(accommodationCostUSD),
-        };
+    return {
+        totalUSD: Math.round(totalUSD), // עיגול הסכום הכולל בדולרים
+        totalILS: Math.round(totalILS), // עיגול הסכום הכולל בשקלים
+        flightsCostUSD: Math.round(flightsCostUSD), // עיגול עלות הטיסות
+        transfersCostUSD: Math.round(transfersCostUSD), // עיגול עלות ההעברות
+        skiPassCostUSD: Math.round(skiPassCostUSD), // עיגול עלות הסקי פס
+        equipmentCostUSD: Math.round(equipmentCostUSD), // עיגול עלות ציוד הסקי
+        dailyExpensesCostUSD: Math.round(dailyExpensesCostUSD), // עיגול עלות ההוצאות היומיות
+        accommodationCostUSD: Math.round(accommodationCostUSD), // עיגול עלות הלינה
     };
+};
 
-    const getAccommodationCosts = (accommodationList) => {
-        return accommodationList.map(acc => {
-            const costUSD = acc.costEUR * EUR_TO_USD;
-            const costILS = acc.costEUR * EUR_TO_ILS;
-            return { ...acc, costUSD: Math.round(costUSD), costILS: Math.round(costILS) };
-        });
-    };
+const getAccommodationCosts = (accommodationList) => {
+    return accommodationList.map(acc => {
+        const costUSD = acc.costEUR * EUR_TO_USD;
+        const costILS = acc.costEUR * EUR_TO_ILS;
+        return { ...acc, costUSD: Math.round(costUSD), costILS: Math.round(costILS) }; // עיגול עלויות הלינה בדולרים ובשקלים
+    });
+};
 
     const currentData = selectedDestination === 'austria' ? mayrhofenData : andorraData;
     const accommodationOptions = currentData ? getAccommodationCosts(currentData.accommodation) : [];
